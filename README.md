@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Dashboard</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #f9f9f9;
+    }
+
+    h1 {
+        text-align: center;
+    }
+
+    .controls {
+        margin: 20px 0;
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    select {
+        padding: 6px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        margin-top: 10px;
+    }
+
+    th, td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #007bff;
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    .counts {
+        margin-top: 30px;
+        background: white;
+        padding: 15px;
+        border-radius: 5px;
+    }
+</style>
+</head>
+<body>
+
+<h1>Student Records Dashboard</h1>
+
+<div class="controls">
+    <div>
+        <label><strong>Sort By:</strong></label>
+        <select id="sortSelect">
+            <option value="name">Name</option>
+            <option value="date">Enrollment Date</option>
+        </select>
+    </div>
+
+    <div>
+        <label><strong>Filter By Department:</strong></label>
+        <select id="filterSelect">
+            <option value="all">All</option>
+            <option value="IT">IT</option>
+            <option value="HR">HR</option>
+            <option value="Finance">Finance</option>
+        </select>
+    </div>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Department</th>
+            <th>Enrollment Date</th>
+        </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+</table>
+
+<div class="counts">
+    <h3>Department Counts</h3>
+    <ul id="deptCount"></ul>
+</div>
+
+<script>
+const students = [
+    { name: "Alice", department: "IT", date: "2023-01-12" },
+    { name: "Bob", department: "HR", date: "2022-11-03" },
+    { name: "Charlie", department: "Finance", date: "2023-05-21" },
+    { name: "David", department: "IT", date: "2022-09-15" },
+    { name: "Eva", department: "HR", date: "2023-03-10" },
+    { name: "Frank", department: "Finance", date: "2022-12-01" }
+];
+
+const tableBody = document.getElementById("tableBody");
+const sortSelect = document.getElementById("sortSelect");
+const filterSelect = document.getElementById("filterSelect");
+const deptCount = document.getElementById("deptCount");
+
+function renderTable(data) {
+    tableBody.innerHTML = "";
+    data.forEach(student => {
+        tableBody.innerHTML += `
+            <tr>
+                <td>${student.name}</td>
+                <td>${student.department}</td>
+                <td>${student.date}</td>
+            </tr>
+        `;
+    });
+}
+
+function updateDepartmentCount(data) {
+    const counts = {};
+    data.forEach(student => {
+        counts[student.department] = (counts[student.department] || 0) + 1;
+    });
+
+    deptCount.innerHTML = "";
+    for (let dept in counts) {
+        deptCount.innerHTML += `<li>${dept}: ${counts[dept]}</li>`;
+    }
+}
+
+function filterAndSort() {
+    let filteredData = [...students];
+
+    // Filter
+    if (filterSelect.value !== "all") {
+        filteredData = filteredData.filter(
+            s => s.department === filterSelect.value
+        );
+    }
+
+    // Sort
+    if (sortSelect.value === "name") {
+        filteredData.sort((a, b) => a.name.localeCompare(b.name));
+    } else {
+        filteredData.sort((a, b) => new Date(a.date) - new Date(b.date));
+    }
+
+    renderTable(filteredData);
+    updateDepartmentCount(filteredData);
+}
+
+sortSelect.addEventListener("change", filterAndSort);
+filterSelect.addEventListener("change", filterAndSort);
+
+// Initial Load
+filterAndSort();
+</script>
+
+</body>
+</html>
